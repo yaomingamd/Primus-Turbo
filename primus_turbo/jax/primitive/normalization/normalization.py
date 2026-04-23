@@ -73,7 +73,7 @@ IMPL_TABLE[adarmsnorm_fwd_p] = partial(xla.apply_primitive, adarmsnorm_fwd_p)
 def _adarmsnorm_fwd_abstract_eval(x, gamma, ada_scale, ada_shift, eps):
     assert x.dtype == gamma.dtype == ada_scale.dtype == ada_shift.dtype, "dtype mismatch"
     assert x.shape[-1] == gamma.shape[0], "last dim mismatch"
-    assert x.shape == ada_scale.shape == ada_shift.shape, "ada_scale/ada_shift shape mismatch"
+    assert x.shape[-1] == ada_scale.shape[0] == ada_shift.shape[0], "ada_scale/ada_shift shape mismatch"
     return ShapedArray(x.shape, x.dtype)
 
 
