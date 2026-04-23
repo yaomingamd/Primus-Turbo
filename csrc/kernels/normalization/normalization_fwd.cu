@@ -70,8 +70,8 @@ __global__ void adarmsnorm_fwd_two_scan_kernel(const T *input, const T *gamma,
 
     const T *input_ptr     = input + bid * inner_len;
     const T *gamma_ptr     = gamma;
-    const T *ada_scale_ptr = ada_scale + bid * inner_len;
-    const T *ada_shift_ptr = ada_shift + bid * inner_len;
+    const T *ada_scale_ptr = ada_scale;
+    const T *ada_shift_ptr = ada_shift;
     T       *output_ptr    = output + bid * inner_len;
 
     const int start_offset = warp_id * THREADS_PER_WARP * UNROLL + lane_id * UNROLL;
