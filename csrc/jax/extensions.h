@@ -18,6 +18,7 @@ namespace primus_turbo::jax {
 //==================================================================
 XLA_FFI_DECLARE_HANDLER_SYMBOL(RMSNormFwdHandler);
 XLA_FFI_DECLARE_HANDLER_SYMBOL(RMSNormBwdHandler);
+XLA_FFI_DECLARE_HANDLER_SYMBOL(AdaRMSNormFwdHandler);
 
 //==================================================================
 //  Grouped GEMM

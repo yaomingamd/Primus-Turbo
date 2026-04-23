@@ -10,6 +10,12 @@ at::Tensor rmsnorm_fwd_meta(const at::Tensor &input, const at::Tensor &gamma, co
     return at::empty_like(input, at::device(at::kMeta));
 }
 
+at::Tensor adarmsnorm_fwd_meta(const at::Tensor &input, const at::Tensor &gamma,
+                                const at::Tensor &ada_scale, const at::Tensor &ada_shift,
+                                const double eps) {
+    return at::empty_like(input, at::device(at::kMeta));
+}
+
 std::vector<at::Tensor> rmsnorm_bwd_meta(const at::Tensor &input, const at::Tensor &gamma,
                                          const at::Tensor &grad_output, const double eps) {
 

@@ -25,6 +25,7 @@ pybind11::dict Registrations() {
     // dict["rmsnorm_fwd"] = EncapsulateFFI(RMSNormFwdHandler);
     REGISTER_FFI_HANDLER(dict, rmsnorm_fwd, RMSNormFwdHandler);
     REGISTER_FFI_HANDLER(dict, rmsnorm_bwd, RMSNormBwdHandler);
+    REGISTER_FFI_HANDLER(dict, adarmsnorm_fwd, AdaRMSNormFwdHandler);
 
     // DeepEP
     REGISTER_FFI_HANDLER(dict, moe_dispatch, MoEDispatchHandler);

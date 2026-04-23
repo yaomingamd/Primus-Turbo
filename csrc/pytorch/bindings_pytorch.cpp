@@ -61,6 +61,7 @@ TORCH_LIBRARY(primus_turbo_cpp_extension, m) {
     // ********* RMSNorm *********
     m.def("rmsnorm_fwd(Tensor input, Tensor gamma, float eps) -> Tensor");
     m.def("rmsnorm_bwd(Tensor input, Tensor gamma, Tensor grad_out, float eps) -> Tensor[]");
+    m.def("adarmsnorm_fwd(Tensor input, Tensor gamma, Tensor ada_scale, Tensor ada_shift, float eps) -> Tensor");
 
     // ********* Grouped Gemm *********
     m.def("ck_grouped_gemm(Tensor a, Tensor b, Tensor group_lens, Tensor group_offs, bool transA, "
@@ -108,6 +109,7 @@ TORCH_LIBRARY_IMPL(primus_turbo_cpp_extension, CUDA, m) {
     // ********* RMSNorm *********
     m.impl("rmsnorm_fwd", rmsnorm_fwd);
     m.impl("rmsnorm_bwd", rmsnorm_bwd);
+    m.impl("adarmsnorm_fwd", adarmsnorm_fwd);
 
     // ********* Grouped Gemm *********
     m.impl("ck_grouped_gemm", ck_grouped_gemm);
@@ -146,6 +148,7 @@ TORCH_LIBRARY_IMPL(primus_turbo_cpp_extension, Meta, m) {
     // ********* RMSNorm *********
     m.impl("rmsnorm_fwd", rmsnorm_fwd_meta);
     m.impl("rmsnorm_bwd", rmsnorm_bwd_meta);
+    m.impl("adarmsnorm_fwd", adarmsnorm_fwd_meta);
 
     // ********* Grouped Gemm *********
     m.impl("ck_grouped_gemm", ck_grouped_gemm_meta);

@@ -167,6 +167,14 @@ std::vector<at::Tensor> rmsnorm_bwd(const at::Tensor &input, const at::Tensor &g
 std::vector<at::Tensor> rmsnorm_bwd_meta(const at::Tensor &input, const at::Tensor &gamma,
                                          const at::Tensor &grad_output, const double eps);
 
+at::Tensor adarmsnorm_fwd(const at::Tensor &input, const at::Tensor &gamma,
+                           const at::Tensor &ada_scale, const at::Tensor &ada_shift,
+                           const double eps);
+
+at::Tensor adarmsnorm_fwd_meta(const at::Tensor &input, const at::Tensor &gamma,
+                                const at::Tensor &ada_scale, const at::Tensor &ada_shift,
+                                const double eps);
+
 //==================================================================
 //  Grouped GEMM
 //==================================================================

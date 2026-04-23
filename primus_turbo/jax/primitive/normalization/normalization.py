@@ -64,4 +64,21 @@ LOWERING_TABLE[rmsnorm_bwd_p] = jax.ffi.ffi_lowering("rmsnorm_bwd")
 # TODO
 
 
-__all__ = ["rmsnorm_fwd_p", "rmsnorm_bwd_p"]
+adarmsnorm_fwd_p = Primitive("adarmsnorm_fwd")
+adarmsnorm_fwd_p.multiple_results = False
+
+IMPL_TABLE[adarmsnorm_fwd_p] = partial(xla.apply_primitive, adarmsnorm_fwd_p)
+
+
+def _adarmsnorm_fwd_abstract_eval(x, gamma, ada_scale, ada_shift, eps):
+    assert x.dtype == gamma.dtype == ada_scale.dtype == ada_shift.dtype, "dtype mismatch"
+    assert x.shape[-1] == gamma.shape[0], "last dim mismatch"
+    assert x.shape == ada_scale.shape == ada_shift.shape, "ada_scale/ada_shift shape mismatch"
+    return ShapedArray(x.shape, x.dtype)
+
+
+ABSTRACT_EVAL_TABLE[adarmsnorm_fwd_p] = _adarmsnorm_fwd_abstract_eval
+
+LOWERING_TABLE[adarmsnorm_fwd_p] = jax.ffi.ffi_lowering("adarmsnorm_fwd")
+
+__all__ = ["rmsnorm_fwd_p", "rmsnorm_bwd_p", "adarmsnorm_fwd_p"]

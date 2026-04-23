@@ -74,4 +74,30 @@ XLA_FFI_DEFINE_HANDLER_SYMBOL(RMSNormBwdHandler, RMSNormBwdFFI,
                                   .Ret<ffi::AnyBuffer>()                    // dgamma
                                   .Attr<double>("eps"));
 
+ffi::Error AdaRMSNormFwdFFI(cudaStream_t stream, ffi::AnyBuffer input, ffi::AnyBuffer gamma,
+                             ffi::AnyBuffer ada_scale, ffi::AnyBuffer ada_shift,
+                             ffi::Result<ffi::AnyBuffer> output, double eps) {
+    const int64_t inner_len = static_cast<int64_t>(gamma.element_count());
+    const int64_t outer_len = static_cast<int64_t>(input.element_count() / inner_len);
+
+    // TODO: refactor
+    adarmsnorm_fwd_impl<float>(input.typed_data<float>(), gamma.typed_data<float>(),
+                               ada_scale.typed_data<float>(), ada_shift.typed_data<float>(),
+                               output->typed_data<float>(), inner_len, outer_len,
+                               static_cast<float>(eps), stream);
+
+    return ffi::Error::Success();
+}
+
+XLA_FFI_DEFINE_HANDLER_SYMBOL(AdaRMSNormFwdHandler, AdaRMSNormFwdFFI,
+                               ffi::Ffi::Bind()
+                                   .Ctx<ffi::PlatformStream<cudaStream_t>>() // stream
+                                   .Arg<ffi::AnyBuffer>()                    // input
+                                   .Arg<ffi::AnyBuffer>()                    // gamma
+                                   .Arg<ffi::AnyBuffer>()                    // ada_scale
+                                   .Arg<ffi::AnyBuffer>()                    // ada_shift
+                                   .Ret<ffi::AnyBuffer>()                    // output
+                                   .Attr<double>("eps")                      // eps
+);
+
 } // namespace primus_turbo::jax

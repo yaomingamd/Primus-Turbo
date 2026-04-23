@@ -6,7 +6,7 @@
 
 import torch
 
-__all__ = ["rmsnorm"]
+__all__ = ["rmsnorm", "adarmsnorm"]
 
 
 class RMSNormFunction(torch.autograd.Function):
@@ -51,3 +51,13 @@ class RMSNormFunction(torch.autograd.Function):
 
 def rmsnorm(x: torch.Tensor, gamma: torch.Tensor, eps: float = 1e-6) -> torch.Tensor:
     return RMSNormFunction.apply(x, gamma, eps)
+
+
+def adarmsnorm(
+    x: torch.Tensor,
+    gamma: torch.Tensor,
+    ada_scale: torch.Tensor,
+    ada_shift: torch.Tensor,
+    eps: float = 1e-6,
+) -> torch.Tensor:
+    return torch.ops.primus_turbo_cpp_extension.adarmsnorm_fwd(x, gamma, ada_scale, ada_shift, eps)

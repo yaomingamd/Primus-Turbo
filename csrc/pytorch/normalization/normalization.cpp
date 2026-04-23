@@ -41,6 +41,46 @@ at::Tensor rmsnorm_fwd(const at::Tensor &input, const at::Tensor &gamma, const d
     return output;
 }
 
+at::Tensor adarmsnorm_fwd(const at::Tensor &input, const at::Tensor &gamma,
+                          const at::Tensor &ada_scale, const at::Tensor &ada_shift,
+                          const double eps) {
+    TORCH_CHECK(input.is_contiguous(), "adarmsnorm_fwd: input must be contiguous.");
+    TORCH_CHECK(gamma.is_contiguous(), "adarmsnorm_fwd: gamma must be contiguous.");
+    TORCH_CHECK(ada_scale.is_contiguous(), "adarmsnorm_fwd: ada_scale must be contiguous.");
+    TORCH_CHECK(ada_shift.is_contiguous(), "adarmsnorm_fwd: ada_shift must be contiguous.");
+
+    const int64_t inner_len = gamma.numel();
+    const int64_t outer_len = input.numel() / inner_len;
+    auto          output    = at::empty_like(input);
+
+    TORCH_CHECK(input.numel() % inner_len == 0, "input.numel() must be divisible by gamma.numel()");
+
+    auto stream = at::cuda::getCurrentCUDAStream();
+    if (input.scalar_type() == at::kFloat) {
+        adarmsnorm_fwd_impl<float>(input.data_ptr<float>(), gamma.data_ptr<float>(),
+                                   ada_scale.data_ptr<float>(), ada_shift.data_ptr<float>(),
+                                   output.data_ptr<float>(), inner_len, outer_len,
+                                   static_cast<float>(eps), stream);
+    } else if (input.scalar_type() == at::kHalf) {
+        adarmsnorm_fwd_impl<float16>(reinterpret_cast<float16 *>(input.data_ptr()),
+                                     reinterpret_cast<float16 *>(gamma.data_ptr()),
+                                     reinterpret_cast<float16 *>(ada_scale.data_ptr()),
+                                     reinterpret_cast<float16 *>(ada_shift.data_ptr()),
+                                     reinterpret_cast<float16 *>(output.data_ptr()), inner_len,
+                                     outer_len, static_cast<float>(eps), stream);
+    } else if (input.scalar_type() == at::kBFloat16) {
+        adarmsnorm_fwd_impl<bfloat16>(reinterpret_cast<bfloat16 *>(input.data_ptr()),
+                                      reinterpret_cast<bfloat16 *>(gamma.data_ptr()),
+                                      reinterpret_cast<bfloat16 *>(ada_scale.data_ptr()),
+                                      reinterpret_cast<bfloat16 *>(ada_shift.data_ptr()),
+                                      reinterpret_cast<bfloat16 *>(output.data_ptr()), inner_len,
+                                      outer_len, static_cast<float>(eps), stream);
+    } else {
+        PRIMUS_TURBO_ERROR("AdaRMSNorm only support : [float32, float16, bfloat16]");
+    }
+    return output;
+}
+
 std::vector<at::Tensor> rmsnorm_bwd(const at::Tensor &input, const at::Tensor &gamma,
                                     const at::Tensor &grad_output, const double eps) {
     TORCH_CHECK(input.is_contiguous(), "rmsnorm_bwd: input must be contiguous.");
