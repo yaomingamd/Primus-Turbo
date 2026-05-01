@@ -17,22 +17,31 @@ def rmsnorm_ref(x, gamma, eps):
     return x / norm * gamma
 
 
+def get_tolerances(dtype):
+    if dtype == jnp.float32:
+        return dict(rtol=1e-4, atol=1e-4)
+    elif dtype in (jnp.float16, jnp.bfloat16):
+        return dict(rtol=1e-2, atol=1e-2)
+    else:
+        raise ValueError(f"Unsupported dtype: {dtype}")
+
+
 @pytest.mark.parametrize("shape", [(1024, 4096)])
-@pytest.mark.parametrize("dtype", [jnp.float32])
+@pytest.mark.parametrize("dtype", [jnp.float32, jnp.float16, jnp.bfloat16])
 def test_rmsnorm_lax(shape, dtype):
     key = jax.random.PRNGKey(0)
-    x = jax.random.normal(key, shape, dtype)
-    gamma = jax.random.normal(key, (shape[-1],), dtype)
+    x = jax.random.normal(key, shape, jnp.float32).astype(dtype)
+    gamma = jax.random.normal(key, (shape[-1],), jnp.float32).astype(dtype)
     eps = 1e-6
+
+    tols = get_tolerances(dtype)
 
     #######################################
     # Fwd
     y = rmsnorm(x, gamma, eps)
     y_ref = rmsnorm_ref(x, gamma, eps)
 
-    print("y ", y)
-    print("y_ref ", y_ref)
-    np.testing.assert_allclose(y, y_ref, rtol=1e-4, atol=1e-4)
+    np.testing.assert_allclose(np.array(y, dtype=np.float32), np.array(y_ref, dtype=np.float32), **tols)
 
     #######################################
     # Backward w.r.t both x and gamma
@@ -48,10 +57,5 @@ def test_rmsnorm_lax(shape, dtype):
     grad_x, grad_gamma = grad_fn(x, gamma)
     grad_x_ref, grad_gamma_ref = grad_fn_ref(x, gamma)
 
-    print("grad_x ", grad_x)
-    print("grad_x_ref ", grad_x_ref)
-    np.testing.assert_allclose(grad_x, grad_x_ref, rtol=1e-4, atol=1e-4)
-
-    print("grad_gamma ", grad_gamma)
-    print("grad_gamma_ref ", grad_gamma_ref)
-    np.testing.assert_allclose(grad_gamma, grad_gamma_ref, rtol=1e-4, atol=1e-4)
+    np.testing.assert_allclose(np.array(grad_x, dtype=np.float32), np.array(grad_x_ref, dtype=np.float32), **tols)
+    np.testing.assert_allclose(np.array(grad_gamma, dtype=np.float32), np.array(grad_gamma_ref, dtype=np.float32), **tols)

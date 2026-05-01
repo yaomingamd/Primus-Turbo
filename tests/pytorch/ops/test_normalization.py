@@ -12,8 +12,7 @@ from primus_turbo.pytorch.ops.normalization import rmsnorm
 from tests.pytorch.test_utils import get_tolerances
 
 
-# @pytest.mark.parametrize("dtype", [torch.float32, torch.float16, torch.bfloat16])
-@pytest.mark.parametrize("dtype", [torch.float32])
+@pytest.mark.parametrize("dtype", [torch.float32, torch.float16, torch.bfloat16])
 @pytest.mark.parametrize("outer_shape", [(1,), (511,), (4096,), (8192,), (16384,)])
 @pytest.mark.parametrize("inner_shape", [33, 513, 4096, 5120, 7168, 8192])
 def test_rmsnorm_ops(dtype, outer_shape, inner_shape):
