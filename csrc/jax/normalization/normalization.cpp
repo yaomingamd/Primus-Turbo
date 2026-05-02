@@ -54,13 +54,13 @@ ffi::Error RMSNormBwdFFI(cudaStream_t stream, ffi::AnyBuffer doutput, ffi::AnyBu
         case ffi::F16:
             rmsnorm_bwd_impl<dtype::float16>(input.typed_data<dtype::float16>(), gamma.typed_data<dtype::float16>(),
                                      doutput.typed_data<dtype::float16>(), dinput->typed_data<dtype::float16>(),
-                                     dgamma->typed_data<dtype::float16>(), inner_len, outer_len, eps_f,
+                                     dgamma->typed_data<float>(), inner_len, outer_len, eps_f,
                                      stream);
             break;
         case ffi::BF16:
             rmsnorm_bwd_impl<dtype::bfloat16>(input.typed_data<dtype::bfloat16>(), gamma.typed_data<dtype::bfloat16>(),
                                       doutput.typed_data<dtype::bfloat16>(), dinput->typed_data<dtype::bfloat16>(),
-                                      dgamma->typed_data<dtype::bfloat16>(), inner_len, outer_len, eps_f,
+                                      dgamma->typed_data<float>(), inner_len, outer_len, eps_f,
                                       stream);
             break;
         default:

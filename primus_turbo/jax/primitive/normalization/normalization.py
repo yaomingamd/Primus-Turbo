@@ -7,6 +7,7 @@
 from functools import partial
 
 import jax
+import jax.numpy as jnp
 from jax.core import ShapedArray
 from jax.extend.core import Primitive
 from jax.interpreters import xla
@@ -45,8 +46,8 @@ ABSTRACT_EVAL_TABLE[rmsnorm_fwd_p] = _fwd_abstract_eval
 def _bwd_abstract_eval(ct, x, gamma, eps):
     assert ct.shape == x.shape
     dx = ShapedArray(x.shape, x.dtype)
-    # TODO: dgamma = ShapedArray(gamma.shape, gamma.dtype)
-    dgamma = ShapedArray(x.shape, x.dtype)
+    # gamma_grad stored in float32 in the kernel to avoid low-precision accumulation error
+    dgamma = ShapedArray(x.shape, jnp.float32)
     return dx, dgamma
 
 

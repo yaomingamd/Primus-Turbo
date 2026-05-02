@@ -37,8 +37,8 @@ def _rmsnorm_fwd(x, gamma, eps):
 def _rmsnorm_bwd(eps, ctx, dy):
     x, gamma = ctx
     dx, dgamma = rmsnorm_bwd_p.bind(dy, x, gamma, eps=eps)
-    # Sum per-row partial dgamma in float32 to avoid low-precision accumulation error
-    return dx, jnp.sum(dgamma.astype(jnp.float32), axis=0).astype(x.dtype)
+    # dgamma is float32 per-row contributions from kernel; sum then cast to x.dtype
+    return dx, jnp.sum(dgamma, axis=0).astype(x.dtype)
 
 
 rmsnorm.defvjp(_rmsnorm_fwd, _rmsnorm_bwd)
