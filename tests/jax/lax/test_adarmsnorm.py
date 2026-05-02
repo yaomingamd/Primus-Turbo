@@ -39,7 +39,9 @@ def test_adarmsnorm_lax(shape, dtype):
     eps = 1e-6
 
     y = adarmsnorm(x, gamma, ada_scale, ada_shift, eps)
-    y_ref = adarmsnorm_ref(x, gamma, ada_scale, ada_shift, eps)
+    # Reference in float32 to match kernel's internal float32 accumulation
+    y_ref = adarmsnorm_ref(x.astype(jnp.float32), gamma.astype(jnp.float32),
+                           ada_scale.astype(jnp.float32), ada_shift.astype(jnp.float32), eps)
 
     tols = get_tolerances(dtype)
     np.testing.assert_allclose(np.array(y, dtype=np.float32), np.array(y_ref, dtype=np.float32), **tols)
