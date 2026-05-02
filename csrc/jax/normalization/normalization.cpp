@@ -20,38 +20,55 @@ namespace primus_turbo::jax {
 
 ffi::Error RMSNormFwdFFI(cudaStream_t stream, ffi::AnyBuffer input, ffi::AnyBuffer gamma,
                          ffi::Result<ffi::AnyBuffer> output, double eps) {
-    // printf("JAX/RMSNormFwdFFI\n");
-    // PrintBufferInfo("input", input);
-    // PrintBufferInfo("gamma", gamma);
-
     const int64_t inner_len = static_cast<int64_t>(gamma.element_count());
     const int64_t outer_len = static_cast<int64_t>(input.element_count() / inner_len);
+    const float   eps_f     = static_cast<float>(eps);
 
-    // TODO: refactor
-    rmsnorm_fwd_impl<float>(input.typed_data<float>(), gamma.typed_data<float>(),
-                            output->typed_data<float>(), inner_len, outer_len,
-                            static_cast<float>(eps), stream);
-
+    switch (input.element_type()) {
+        case ffi::F16:
+            rmsnorm_fwd_impl<float16>(input.typed_data<float16>(), gamma.typed_data<float16>(),
+                                     output->typed_data<float16>(), inner_len, outer_len, eps_f,
+                                     stream);
+            break;
+        case ffi::BF16:
+            rmsnorm_fwd_impl<bfloat16>(input.typed_data<bfloat16>(), gamma.typed_data<bfloat16>(),
+                                      output->typed_data<bfloat16>(), inner_len, outer_len, eps_f,
+                                      stream);
+            break;
+        default:
+            rmsnorm_fwd_impl<float>(input.typed_data<float>(), gamma.typed_data<float>(),
+                                   output->typed_data<float>(), inner_len, outer_len, eps_f,
+                                   stream);
+    }
     return ffi::Error::Success();
 }
 
 ffi::Error RMSNormBwdFFI(cudaStream_t stream, ffi::AnyBuffer doutput, ffi::AnyBuffer input,
                          ffi::AnyBuffer gamma, ffi::Result<ffi::AnyBuffer> dinput,
                          ffi::Result<ffi::AnyBuffer> dgamma, double eps) {
-    // printf("JAX/RMSNormBwdFFI\n");
-    // PrintBufferInfo("doutput", doutput);
-    // PrintBufferInfo("input", input);
-    // PrintBufferInfo("gamma", gamma);
-    // PrintBufferInfo("dgamma", *dgamma);
-
     const int64_t inner_len = static_cast<int64_t>(gamma.element_count());
     const int64_t outer_len = static_cast<int64_t>(input.element_count() / inner_len);
+    const float   eps_f     = static_cast<float>(eps);
 
-    // TODO: refactor
-    rmsnorm_bwd_impl<float>(input.typed_data<float>(), gamma.typed_data<float>(),
-                            doutput.typed_data<float>(), dinput->typed_data<float>(),
-                            dgamma->typed_data<float>(), inner_len, outer_len,
-                            static_cast<float>(eps), stream);
+    switch (input.element_type()) {
+        case ffi::F16:
+            rmsnorm_bwd_impl<float16>(input.typed_data<float16>(), gamma.typed_data<float16>(),
+                                     doutput.typed_data<float16>(), dinput->typed_data<float16>(),
+                                     dgamma->typed_data<float16>(), inner_len, outer_len, eps_f,
+                                     stream);
+            break;
+        case ffi::BF16:
+            rmsnorm_bwd_impl<bfloat16>(input.typed_data<bfloat16>(), gamma.typed_data<bfloat16>(),
+                                      doutput.typed_data<bfloat16>(), dinput->typed_data<bfloat16>(),
+                                      dgamma->typed_data<bfloat16>(), inner_len, outer_len, eps_f,
+                                      stream);
+            break;
+        default:
+            rmsnorm_bwd_impl<float>(input.typed_data<float>(), gamma.typed_data<float>(),
+                                   doutput.typed_data<float>(), dinput->typed_data<float>(),
+                                   dgamma->typed_data<float>(), inner_len, outer_len, eps_f,
+                                   stream);
+    }
     return ffi::Error::Success();
 }
 
@@ -79,13 +96,27 @@ ffi::Error AdaRMSNormFwdFFI(cudaStream_t stream, ffi::AnyBuffer input, ffi::AnyB
                              ffi::Result<ffi::AnyBuffer> output, double eps) {
     const int64_t inner_len = static_cast<int64_t>(gamma.element_count());
     const int64_t outer_len = static_cast<int64_t>(input.element_count() / inner_len);
+    const float   eps_f     = static_cast<float>(eps);
 
-    // TODO: refactor
-    adarmsnorm_fwd_impl<float>(input.typed_data<float>(), gamma.typed_data<float>(),
-                               ada_scale.typed_data<float>(), ada_shift.typed_data<float>(),
-                               output->typed_data<float>(), inner_len, outer_len,
-                               static_cast<float>(eps), stream);
-
+    switch (input.element_type()) {
+        case ffi::F16:
+            adarmsnorm_fwd_impl<float16>(
+                input.typed_data<float16>(), gamma.typed_data<float16>(),
+                ada_scale.typed_data<float16>(), ada_shift.typed_data<float16>(),
+                output->typed_data<float16>(), inner_len, outer_len, eps_f, stream);
+            break;
+        case ffi::BF16:
+            adarmsnorm_fwd_impl<bfloat16>(
+                input.typed_data<bfloat16>(), gamma.typed_data<bfloat16>(),
+                ada_scale.typed_data<bfloat16>(), ada_shift.typed_data<bfloat16>(),
+                output->typed_data<bfloat16>(), inner_len, outer_len, eps_f, stream);
+            break;
+        default:
+            adarmsnorm_fwd_impl<float>(
+                input.typed_data<float>(), gamma.typed_data<float>(),
+                ada_scale.typed_data<float>(), ada_shift.typed_data<float>(),
+                output->typed_data<float>(), inner_len, outer_len, eps_f, stream);
+    }
     return ffi::Error::Success();
 }
 
