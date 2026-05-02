@@ -60,6 +60,8 @@ __global__ void rmsnorm_bwd_two_scan_stage_0_kernel(const T *input, const T *gam
     const float dot_sum = BlockReduce<SumOp, float>(local_dot_sum) / static_cast<float>(inner_len);
     const float coeff   = dot_sum * inv_std3;
 
+    // Store dg in chunks of 4 floats (16 bytes = uint4) regardless of T's UNROLL
+    constexpr int FLOAT_STORE_N = sizeof(uint4) / sizeof(float);
     T     dx_regs[UNROLL];
     float dg_regs[UNROLL];
     for (int64_t offset = start_offset; offset < inner_len; offset += (BLOCKSIZE * UNROLL)) {
@@ -78,7 +80,10 @@ __global__ void rmsnorm_bwd_two_scan_stage_0_kernel(const T *input, const T *gam
             dg_regs[i]     = dg;
         }
         store_data<T, UNROLL>(input_grad_ptr + offset, dx_regs);
-        store_data<float, UNROLL>(gamma_grad_ptr + offset, dg_regs);
+#pragma unroll
+        for (int s = 0; s < UNROLL; s += FLOAT_STORE_N) {
+            store_data<float, FLOAT_STORE_N>(gamma_grad_ptr + offset + s, dg_regs + s);
+        }
     }
 }
 
