@@ -26,13 +26,13 @@ ffi::Error RMSNormFwdFFI(cudaStream_t stream, ffi::AnyBuffer input, ffi::AnyBuff
 
     switch (input.element_type()) {
         case ffi::F16:
-            rmsnorm_fwd_impl<float16>(input.typed_data<float16>(), gamma.typed_data<float16>(),
-                                     output->typed_data<float16>(), inner_len, outer_len, eps_f,
+            rmsnorm_fwd_impl<dtype::float16>(input.typed_data<dtype::float16>(), gamma.typed_data<dtype::float16>(),
+                                     output->typed_data<dtype::float16>(), inner_len, outer_len, eps_f,
                                      stream);
             break;
         case ffi::BF16:
-            rmsnorm_fwd_impl<bfloat16>(input.typed_data<bfloat16>(), gamma.typed_data<bfloat16>(),
-                                      output->typed_data<bfloat16>(), inner_len, outer_len, eps_f,
+            rmsnorm_fwd_impl<dtype::bfloat16>(input.typed_data<dtype::bfloat16>(), gamma.typed_data<dtype::bfloat16>(),
+                                      output->typed_data<dtype::bfloat16>(), inner_len, outer_len, eps_f,
                                       stream);
             break;
         default:
@@ -52,15 +52,15 @@ ffi::Error RMSNormBwdFFI(cudaStream_t stream, ffi::AnyBuffer doutput, ffi::AnyBu
 
     switch (input.element_type()) {
         case ffi::F16:
-            rmsnorm_bwd_impl<float16>(input.typed_data<float16>(), gamma.typed_data<float16>(),
-                                     doutput.typed_data<float16>(), dinput->typed_data<float16>(),
-                                     dgamma->typed_data<float16>(), inner_len, outer_len, eps_f,
+            rmsnorm_bwd_impl<dtype::float16>(input.typed_data<dtype::float16>(), gamma.typed_data<dtype::float16>(),
+                                     doutput.typed_data<dtype::float16>(), dinput->typed_data<dtype::float16>(),
+                                     dgamma->typed_data<dtype::float16>(), inner_len, outer_len, eps_f,
                                      stream);
             break;
         case ffi::BF16:
-            rmsnorm_bwd_impl<bfloat16>(input.typed_data<bfloat16>(), gamma.typed_data<bfloat16>(),
-                                      doutput.typed_data<bfloat16>(), dinput->typed_data<bfloat16>(),
-                                      dgamma->typed_data<bfloat16>(), inner_len, outer_len, eps_f,
+            rmsnorm_bwd_impl<dtype::bfloat16>(input.typed_data<dtype::bfloat16>(), gamma.typed_data<dtype::bfloat16>(),
+                                      doutput.typed_data<dtype::bfloat16>(), dinput->typed_data<dtype::bfloat16>(),
+                                      dgamma->typed_data<dtype::bfloat16>(), inner_len, outer_len, eps_f,
                                       stream);
             break;
         default:
@@ -100,16 +100,16 @@ ffi::Error AdaRMSNormFwdFFI(cudaStream_t stream, ffi::AnyBuffer input, ffi::AnyB
 
     switch (input.element_type()) {
         case ffi::F16:
-            adarmsnorm_fwd_impl<float16>(
-                input.typed_data<float16>(), gamma.typed_data<float16>(),
-                ada_scale.typed_data<float16>(), ada_shift.typed_data<float16>(),
-                output->typed_data<float16>(), inner_len, outer_len, eps_f, stream);
+            adarmsnorm_fwd_impl<dtype::float16>(
+                input.typed_data<dtype::float16>(), gamma.typed_data<dtype::float16>(),
+                ada_scale.typed_data<dtype::float16>(), ada_shift.typed_data<dtype::float16>(),
+                output->typed_data<dtype::float16>(), inner_len, outer_len, eps_f, stream);
             break;
         case ffi::BF16:
-            adarmsnorm_fwd_impl<bfloat16>(
-                input.typed_data<bfloat16>(), gamma.typed_data<bfloat16>(),
-                ada_scale.typed_data<bfloat16>(), ada_shift.typed_data<bfloat16>(),
-                output->typed_data<bfloat16>(), inner_len, outer_len, eps_f, stream);
+            adarmsnorm_fwd_impl<dtype::bfloat16>(
+                input.typed_data<dtype::bfloat16>(), gamma.typed_data<dtype::bfloat16>(),
+                ada_scale.typed_data<dtype::bfloat16>(), ada_shift.typed_data<dtype::bfloat16>(),
+                output->typed_data<dtype::bfloat16>(), inner_len, outer_len, eps_f, stream);
             break;
         default:
             adarmsnorm_fwd_impl<float>(
